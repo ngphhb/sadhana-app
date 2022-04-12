@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "457078035883",
+    "firebase_url": "https://csms-babd0.firebaseio.com",
+    "project_id": "csms-babd0",
+    "storage_bucket": "csms-babd0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:457078035883:android:f56d58faaa3f95c1c5eeee",
+        "android_client_info": {
+          "package_name": "com.example.my_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "457078035883-nti6joedr7gr1t3e0im9388uavbuqptm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-wLMEWUn2S_-MqZ-_OJDeKu6YrsBIcCQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "457078035883-nti6joedr7gr1t3e0im9388uavbuqptm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
