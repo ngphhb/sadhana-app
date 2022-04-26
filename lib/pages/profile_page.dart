@@ -1,12 +1,27 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/pages/widgets/header_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    Object name='null',email='null';
+    Future<void> getUserDetails() async {
+      final prefs = await SharedPreferences.getInstance();
+      name = prefs.get('name') ?? "null";
+      name = prefs.get('email') ?? "null";
+    }
+    getUserDetails();
+    String userName = "null",userEmail="null";
+    User? user = FirebaseAuth.instance.currentUser;
+    userName = user?.displayName ?? "null";
+    userEmail = user?.email ?? "null";
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sadhana",
@@ -23,25 +38,25 @@ class ProfilePage extends StatelessWidget {
               )
           ),
         ),
-        actions: [
-          Container(
-            margin: EdgeInsets.only( top: 16, right: 16,),
-            child: Stack(
-              children: <Widget>[
-                Icon(Icons.notifications),
-                Positioned(
-                  right: 0,
-                  child: Container(
-                    padding: EdgeInsets.all(1),
-                    decoration: BoxDecoration( color: Colors.red, borderRadius: BorderRadius.circular(6),),
-                    constraints: BoxConstraints( minWidth: 12, minHeight: 12, ),
-                    child: Text( '5', style: TextStyle(color: Colors.white, fontSize: 8,), textAlign: TextAlign.center,),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
+        // actions: [
+        //   Container(
+        //     margin: EdgeInsets.only( top: 16, right: 16,),
+        //     child: Stack(
+        //       children: <Widget>[
+        //         Icon(Icons.notifications),
+        //         Positioned(
+        //           right: 0,
+        //           child: Container(
+        //             padding: EdgeInsets.all(1),
+        //             decoration: BoxDecoration( color: Colors.red, borderRadius: BorderRadius.circular(6),),
+        //             constraints: BoxConstraints( minWidth: 12, minHeight: 12, ),
+        //             child: Text( '5', style: TextStyle(color: Colors.white, fontSize: 8,), textAlign: TextAlign.center,),
+        //           ),
+        //         )
+        //       ],
+        //     ),
+        //   )
+        // ],
       ),
       body: SingleChildScrollView(
         child: Stack(
@@ -66,72 +81,74 @@ class ProfilePage extends StatelessWidget {
                     child: Icon(Icons.person, size: 80, color: Colors.grey.shade300,),
                   ),
                   SizedBox(height: 20,),
-                  Text('Mr. Donald Trump', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+                  // Text('Mr. Donald Trump', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+                  Text(userName, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+                  // Text('this part of app is under development', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
                   SizedBox(height: 20,),
-                  Text('Former President', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                  Text(userEmail, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
                   SizedBox(height: 10,),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "User Information",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        Card(
-                          child: Container(
-                            alignment: Alignment.topLeft,
-                            padding: EdgeInsets.all(15),
-                            child: Column(
-                              children: <Widget>[
-                                Column(
-                                  children: <Widget>[
-                                    ...ListTile.divideTiles(
-                                      color: Colors.grey,
-                                      tiles: [
-                                        ListTile(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 4),
-                                          leading: Icon(Icons.my_location),
-                                          title: Text("Location"),
-                                          subtitle: Text("USA"),
-                                        ),
-                                        ListTile(
-                                          leading: Icon(Icons.email),
-                                          title: Text("Email"),
-                                          subtitle: Text("donaldtrump@gmail.com"),
-                                        ),
-                                        ListTile(
-                                          leading: Icon(Icons.phone),
-                                          title: Text("Phone"),
-                                          subtitle: Text("99--99876-56"),
-                                        ),
-                                        ListTile(
-                                          leading: Icon(Icons.person),
-                                          title: Text("About Me"),
-                                          subtitle: Text(
-                                              "This is a about me link and you can khow about me in this section."),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
+                  // Container(
+                  //   padding: EdgeInsets.all(10),
+                  //   child: Column(
+                  //     children: <Widget>[
+                  //       Container(
+                  //         padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                  //         alignment: Alignment.topLeft,
+                  //         child: Text(
+                  //           "User Information",
+                  //           style: TextStyle(
+                  //             color: Colors.black87,
+                  //             fontWeight: FontWeight.w500,
+                  //             fontSize: 16,
+                  //           ),
+                  //           textAlign: TextAlign.left,
+                  //         ),
+                  //       ),
+                  //       Card(
+                  //         child: Container(
+                  //           alignment: Alignment.topLeft,
+                  //           padding: EdgeInsets.all(10),
+                  //           child: Column(
+                  //             children: <Widget>[
+                  //               Column(
+                  //                 children: <Widget>[
+                  //                   ...ListTile.divideTiles(
+                  //                     color: Colors.grey,
+                  //                     tiles: [
+                  //                       ListTile(
+                  //                         contentPadding: EdgeInsets.symmetric(
+                  //                             horizontal: 12, vertical: 4),
+                  //                         leading: Icon(Icons.my_location),
+                  //                         title: Text("Location"),
+                  //                         subtitle: Text("USA"),
+                  //                       ),
+                  //                       ListTile(
+                  //                         leading: Icon(Icons.email),
+                  //                         title: Text("Email"),
+                  //                         subtitle: Text("donaldtrump@gmail.com"),
+                  //                       ),
+                  //                       ListTile(
+                  //                         leading: Icon(Icons.phone),
+                  //                         title: Text("Phone"),
+                  //                         subtitle: Text("99--99876-56"),
+                  //                       ),
+                  //                       ListTile(
+                  //                         leading: Icon(Icons.person),
+                  //                         title: Text("About Me"),
+                  //                         subtitle: Text(
+                  //                             "This is a about me link and you can khow about me in this section."),
+                  //                       ),
+                  //                     ],
+                  //                   ),
+                  //                 ],
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // )
                 ],
               ),
             )

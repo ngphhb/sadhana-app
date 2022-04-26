@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:my_app/common/theme_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +24,9 @@ class _LoginPageState extends State<LoginPage> {
 
   String _email = '', _password = '';
   // bool _showPassword = true;
-  bool _load = false;
+  bool _load = true;
+
+  User? result = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -54,134 +57,165 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 30.0),
-                      Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              Container(
-                                child: TextField(
-                                  onChanged: (input) => _email = input,
-                                  keyboardType: TextInputType.emailAddress,
-                                  decoration: ThemeHelper().textInputDecoration(
-                                      'User Name', 'Enter your user name'),
-                                ),
-                                decoration:
-                                    ThemeHelper().inputBoxDecorationShaddow(),
-                              ),
-                              const SizedBox(height: 30.0),
-                              Container(
-                                child: TextField(
-                                  obscureText: true,
-                                  onChanged: (input) => _password = input,
-                                  keyboardType: TextInputType.visiblePassword,
-                                  decoration: ThemeHelper().textInputDecoration(
-                                      'Password', 'Enter your password'),
-                                ),
-                                decoration:
-                                    ThemeHelper().inputBoxDecorationShaddow(),
-                              ),
-                              const SizedBox(height: 15.0),
-                              Container(
-                                margin:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 20),
-                                alignment: Alignment.topRight,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ForgotPasswordPage()),
-                                    );
-                                  },
-                                  child: const Text(
-                                    "Forgot your password?",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              !_load
-                                  ? Container(
-                                      decoration: ThemeHelper()
-                                          .buttonBoxDecoration(context),
-                                      child: ElevatedButton(
-                                        style: ThemeHelper().buttonStyle(),
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              40, 10, 40, 10),
-                                          child: Text(
-                                            'Sign In'.toUpperCase(),
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          RegExp regExp = RegExp(
-                                              r'^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
-                                          final formState =
-                                              _formKey.currentState;
-                                          formState?.save();
-                                          if (_email.isEmpty) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                                    content: Text(
-                                                        'Email Cannot be empty')));
-                                          } else if (_password.length < 6) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                                    content: Text(
-                                                        'Password needs to be atleast six characters')));
-                                          } else if (!regExp.hasMatch(_email)) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                                    content: Text(
-                                                        'Enter a Valid Email')));
-                                          } else {
-                                            setState(() {
-                                              _load = true;
-                                            });
-                                            signIn();
-                                            // //After successful login we will redirect to profile page. Let's create profile page now
-                                            // Navigator.pushReplacement(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             Dashboard()));
-                                          }
-                                        },
-                                      ),
-                                    )
-                                  : const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.fromLTRB(10, 20, 10, 20),
-                                //child: Text('Don\'t have an account? Create'),
-                                child: Text.rich(TextSpan(children: [
-                                  TextSpan(text: "Don\'t have an account? "),
-                                  TextSpan(
-                                    text: 'Create',
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    RegistrationPage()));
-                                      },
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context).accentColor),
-                                  ),
-                                ])),
-                              ),
-                            ],
-                          )),
+                      Container(
+                        decoration: ThemeHelper()
+                            .buttonBoxDecoration(context),
+                        child: ElevatedButton(
+                          style: ThemeHelper().buttonStyle(),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(
+                                40, 10, 40, 10),
+                            child: Text(
+                              'Google Sign In / Sign Up'.toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          onPressed: () {
+                            result != null ? Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        Dashboard())) : {
+                              // _load ? Center(
+                              //   child: CircularProgressIndicator(),
+                              // ) : Container(),
+                              signIn()
+                            };
+                          },
+                        ),
+                      )
+
+                      // Form(
+                      //     key: _formKey,
+                      //     child: Column(
+                      //       children: [
+                      //         Container(
+                      //           child: TextField(
+                      //             onChanged: (input) => _email = input,
+                      //             keyboardType: TextInputType.emailAddress,
+                      //             decoration: ThemeHelper().textInputDecoration(
+                      //                 'User Name', 'Enter your user name'),
+                      //           ),
+                      //           decoration:
+                      //               ThemeHelper().inputBoxDecorationShaddow(),
+                      //         ),
+                      //         const SizedBox(height: 30.0),
+                      //         Container(
+                      //           child: TextField(
+                      //             obscureText: true,
+                      //             onChanged: (input) => _password = input,
+                      //             keyboardType: TextInputType.visiblePassword,
+                      //             decoration: ThemeHelper().textInputDecoration(
+                      //                 'Password', 'Enter your password'),
+                      //           ),
+                      //           decoration:
+                      //               ThemeHelper().inputBoxDecorationShaddow(),
+                      //         ),
+                      //         const SizedBox(height: 15.0),
+                      //         Container(
+                      //           margin:
+                      //               const EdgeInsets.fromLTRB(10, 0, 10, 20),
+                      //           alignment: Alignment.topRight,
+                      //           child: GestureDetector(
+                      //             onTap: () {
+                      //               Navigator.push(
+                      //                 context,
+                      //                 MaterialPageRoute(
+                      //                     builder: (context) =>
+                      //                         ForgotPasswordPage()),
+                      //               );
+                      //             },
+                      //             child: const Text(
+                      //               "Forgot your password?",
+                      //               style: TextStyle(
+                      //                 color: Colors.grey,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //         !_load
+                      //             ? Container(
+                      //                 decoration: ThemeHelper()
+                      //                     .buttonBoxDecoration(context),
+                      //                 child: ElevatedButton(
+                      //                   style: ThemeHelper().buttonStyle(),
+                      //                   child: Padding(
+                      //                     padding: const EdgeInsets.fromLTRB(
+                      //                         40, 10, 40, 10),
+                      //                     child: Text(
+                      //                       'Sign In'.toUpperCase(),
+                      //                       style: const TextStyle(
+                      //                           fontSize: 20,
+                      //                           fontWeight: FontWeight.bold,
+                      //                           color: Colors.white),
+                      //                     ),
+                      //                   ),
+                      //                   onPressed: () {
+                      //                     RegExp regExp = RegExp(
+                      //                         r'^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
+                      //                     final formState =
+                      //                         _formKey.currentState;
+                      //                     formState?.save();
+                      //                     if (_email.isEmpty) {
+                      //                       ScaffoldMessenger.of(context)
+                      //                           .showSnackBar(const SnackBar(
+                      //                               content: Text(
+                      //                                   'Email Cannot be empty')));
+                      //                     } else if (_password.length < 6) {
+                      //                       ScaffoldMessenger.of(context)
+                      //                           .showSnackBar(const SnackBar(
+                      //                               content: Text(
+                      //                                   'Password needs to be atleast six characters')));
+                      //                     } else if (!regExp.hasMatch(_email)) {
+                      //                       ScaffoldMessenger.of(context)
+                      //                           .showSnackBar(const SnackBar(
+                      //                               content: Text(
+                      //                                   'Enter a Valid Email')));
+                      //                     } else {
+                      //                       setState(() {
+                      //                         _load = true;
+                      //                       });
+                      //                       signIn();
+                      //                       // //After successful login we will redirect to profile page. Let's create profile page now
+                      //                       // Navigator.pushReplacement(
+                      //                       //     context,
+                      //                       //     MaterialPageRoute(
+                      //                       //         builder: (context) =>
+                      //                       //             Dashboard()));
+                      //                     }
+                      //                   },
+                      //                 ),
+                      //               )
+                      //             : const Center(
+                      //                 child: CircularProgressIndicator(),
+                      //               ),
+                      //         Container(
+                      //           margin:
+                      //               const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                      //           //child: Text('Don\'t have an account? Create'),
+                      //           child: Text.rich(TextSpan(children: [
+                      //             TextSpan(text: "Don\'t have an account? "),
+                      //             TextSpan(
+                      //               text: 'Create',
+                      //               recognizer: TapGestureRecognizer()
+                      //                 ..onTap = () {
+                      //                   Navigator.push(
+                      //                       context,
+                      //                       MaterialPageRoute(
+                      //                           builder: (context) =>
+                      //                               RegistrationPage()));
+                      //                 },
+                      //               style: TextStyle(
+                      //                   fontWeight: FontWeight.bold,
+                      //                   color: Theme.of(context).accentColor),
+                      //             ),
+                      //           ])),
+                      //         ),
+                      //       ],
+                      //     )),
                     ],
                   )),
             ),
@@ -189,6 +223,23 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   Future<void> signIn() async {
@@ -221,18 +272,44 @@ class _LoginPageState extends State<LoginPage> {
     // }
 
     try {
-      final result = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: _email, password: _password);
+      // final result = await FirebaseAuth.instance
+      //     .signInWithEmailAndPassword(email: _email, password: _password);
 
-      User? user = result.user;
+      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+      final GoogleSignInAuthentication? googleSignInAuthentication = await googleSignInAccount?.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication?.accessToken,
+        idToken: googleSignInAuthentication?.idToken,
+      );
+      final UserCredential authResult = await firebaseAuth.signInWithCredential(credential);
+      final User? user = authResult.user;
+
+      // User? user = result?.user;
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(user?.uid)
           .get();
 
+      if (!snapshot.exists) {
+        CollectionReference data = FirebaseFirestore.instance
+            .collection('users');
+        data.doc(user?.uid).set({
+          "name": user?.displayName,
+          "email": user?.email,
+          "role": "DEVOTEE"
+        });
+        snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user?.uid)
+            .get();
+      }
+
       storeUserInSharedPreferences('email',user?.email);
       storeUserInSharedPreferences('userid',user?.uid);
-      // storeUserInSharedPreferences('role',snapshot['role']);
+      storeUserInSharedPreferences('name',user?.displayName);
+      storeUserInSharedPreferences('role',snapshot['role']);
       // final SharedPreferences prefs = await SharedPreferences.getInstance();
       //
       // prefs.setString('email', user?.email);
